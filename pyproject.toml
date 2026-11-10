@@ -113,11 +113,15 @@ Changelog = "https://github.com/cleancloud-io/cleancloud/releases"
 
 [project.scripts]
 cleancloud = "cleancloud.cli:main"
+upcloud = "upcloud.server:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["cleancloud*"]
+include = ["cleancloud*", "upcloud*"]
 exclude = ["tests*", "docs*"]
+
+[tool.setuptools.package-data]
+upcloud = ["static/*.css", "static/*.html", "static/*.js"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

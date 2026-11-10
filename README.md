@@ -124,6 +124,25 @@ cleancloud scan --provider azure
 cleancloud scan --provider gcp --all-projects
 ```
 
+## UpCloud Web Demo
+
+This repository also includes **UpCloud**, a local web dashboard for exploring the sample findings used by CleanCloud. It is designed for demonstrations and coursework: it does not connect to AWS, Azure, or GCP, and it never changes cloud resources.
+
+From the repository folder, install the project and start the dashboard:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e .
+upcloud
+```
+
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. Choose a cloud provider or finding category, search the findings, open a row for details, or select **Run demo scan** to refresh the simulated results. Stop the local server with `Ctrl+C`.
+
+On macOS or Linux, activate the virtual environment with `source .venv/bin/activate` instead. If the `upcloud` command is not found after installation, run `python -m upcloud` from the repository folder.
+
+The dashboard API is available at `/api/dashboard`, `/api/findings`, and `POST /api/scan`. The scan endpoint only returns the bundled sample dataset; real cloud monitoring is not implemented by this web demo.
+
 **Choose your path:**
 
 | I want to… | Start here |
