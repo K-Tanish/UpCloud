@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <title>UpCloud | Cloud Cost Intelligence</title>
+    <link rel="stylesheet" href="app.css">
+  </head>
+  <body>
+    <nav class="top-nav">
+      <div class="nav-container">
+        <div class="nav-left">
+          <a class="brand" href="/" aria-label="UpCloud home">
+            <span class="brand-mark">U</span>
+            <span class="brand-text">upcloud</span>
+          </a>
+          <div class="nav-links">
+            <a class="nav-item active" href="#dashboard" data-view="dashboard">Dashboard</a>
+            <a class="nav-item" href="#infrastructure" data-view="infrastructure">Infrastructure</a>
+          </div>
+        </div>
+        <div class="nav-right">
+          <span class="status-badge"><span class="status-dot"></span>Simulation mode</span>
+          <div class="user-menu">
+            <div class="user-avatar">S</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-wrapper">
+      <!-- Dashboard View -->
+      <div id="dashboard-view">
+      <div class="hero-section">
+        <div class="container">
+          <div class="hero-content">
+            <p class="hero-label">CLOUD COST INTELLIGENCE</p>
+            <h1>Good morning</h1>
+            <p class="hero-subtitle">A clear view of cloud resources that may be costing more than they should.</p>
+            <button id="scan-button" class="btn-primary" type="button">
+              <span>↻</span> Run demo scan
+            </button>
+            <button id="real-scan-button" class="btn-secondary" type="button" style="margin-left: 12px;">
+              <span>☁</span> Scan Real AWS
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="info-banner">
+          <div class="banner-icon">i</div>
+          <div class="banner-content">
+            <strong>Demo data is active.</strong> This dashboard uses sample findings from CleanCloud. It does not connect to, monitor, or change real cloud accounts.
+          </div>
+          <span class="banner-badge">SAFE SIMULATION</span>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label>
+              <span>Cloud provider</span>
+              <select id="provider-filter">
+                <option value="all">All providers</option>
+                <option value="aws">Amazon Web Services</option>
+                <option value="azure">Microsoft Azure</option>
+                <option value="gcp">Google Cloud</option>
+              </select>
+            </label>
+            <label>
+              <span>Finding category</span>
+              <select id="category-filter">
+                <option value="hygiene">Cloud hygiene</option>
+                <option value="ai">AI & machine learning</option>
+              </select>
+            </label>
+          </div>
+          <span class="filter-updated" id="updated-label">Sample results</span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">▦</div>
+            <div class="stat-label">DEMO FINDINGS</div>
+            <div class="stat-value" id="total-findings">—</div>
+            <div class="stat-desc">Sample resources flagged</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">$</div>
+            <div class="stat-label">POTENTIAL MONTHLY WASTE</div>
+            <div class="stat-value" id="monthly-waste">—</div>
+            <div class="stat-desc">Estimated from samples</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">!</div>
+            <div class="stat-label">HIGH-PRIORITY REVIEWS</div>
+            <div class="stat-value" id="high-risk">—</div>
+            <div class="stat-desc">High or critical risk findings</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">☁</div>
+            <div class="stat-label">CLOUD PROVIDERS</div>
+            <div class="stat-value" id="provider-count">—</div>
+            <div class="stat-desc">Represented in sample</div>
+          </div>
+        </div>
+
+        <div class="insights-row">
+          <div class="insight-card">
+            <div class="card-header">
+              <div>
+                <h2>Findings by provider</h2>
+                <p>Where demo findings were identified</p>
+              </div>
+            </div>
+            <div id="provider-chart" class="provider-chart"></div>
+          </div>
+
+          <div class="insight-card">
+            <div class="card-header">
+              <div>
+                <h2>Largest opportunities</h2>
+                <p>Estimated monthly cost to review</p>
+              </div>
+            </div>
+            <div id="top-opportunities" class="opportunities-list"></div>
+          </div>
+        </div>
+
+        <div class="findings-section">
+          <div class="section-header">
+            <div>
+              <h2>Findings to review</h2>
+              <p>These are suggestions for human review—not automatic actions.</p>
+            </div>
+            <div class="search-container">
+              <span class="search-icon">⌕</span>
+              <input id="search-input" type="search" placeholder="Search findings..." />
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="findings-table">
+              <thead>
+                <tr>
+                  <th>RESOURCE</th>
+                  <th>PROVIDER</th>
+                  <th>LOCATION</th>
+                  <th>RISK</th>
+                  <th>CONFIDENCE</th>
+                  <th>EST. MONTHLY COST</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="findings-body"></tbody>
+            </table>
+          </div>
+          <p class="table-footer" id="table-status"></p>
+        </div>
+      </div>
+
+      <!-- Infrastructure View -->
+      <div id="infrastructure-view" style="display: none;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <div style="padding: 60px 0 40px 0;">
+          <p style="font-size: 12px; color: #718096; letter-spacing: 0.1em; margin-bottom: 12px;">AWS INFRASTRUCTURE</p>
+          <h1 style="font-size: 36px; margin-bottom: 12px;">Cloud Resources</h1>
+          <p style="color: #718096;">Live metrics and resource monitoring from your AWS deployment</p>
+        </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">λ</div>
+              <div class="stat-label">LAMBDA FUNCTION</div>
+              <div class="stat-value">Active</div>
+              <div class="stat-desc">upcloud-api-dev</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⚡</div>
+              <div class="stat-label">FUNCTION MEMORY</div>
+              <div class="stat-value">512 MB</div>
+              <div class="stat-desc">Auto-scales as needed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⍟</div>
+              <div class="stat-label">DATABASE</div>
+              <div class="stat-value">DynamoDB</div>
+              <div class="stat-desc">upcloud-findings-dev</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🌍</div>
+              <div class="stat-label">REGION</div>
+              <div class="stat-value">ap-southeast-2</div>
+              <div class="stat-desc">Sydney, Australia</div>
+            </div>
+          </div>
+
+          <div class="insights-row">
+            <div class="insight-card">
+              <div class="card-header">
+                <div>
+                  <h2>Architecture Diagram</h2>
+                  <p>Serverless infrastructure deployed on AWS</p>
+                </div>
+              </div>
+              <div class="architecture-diagram">
+                <div class="arch-node">
+                  <div class="arch-icon">👤</div>
+                  <div class="arch-label">User Browser</div>
+                  <div class="arch-sublabel">HTTPS</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-node highlight">
+                  <div class="arch-icon">λ</div>
+                  <div class="arch-label">Lambda Function URL</div>
+                  <div class="arch-sublabel">Python 3.11 | 512MB</div>
+                </div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-node">
+                  <div class="arch-icon">⍟</div>
+                  <div class="arch-label">DynamoDB</div>
+                  <div class="arch-sublabel">NoSQL | On-demand</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card">
+              <div class="card-header">
+                <div>
+                  <h2>AWS Resources</h2>
+                  <p>Deployed cloud services</p>
+                </div>
+              </div>
+              <div class="resource-list">
+                <div class="resource-item">
+                  <div class="resource-icon">λ</div>
+                  <div class="resource-info">
+                    <div class="resource-name">Lambda Function</div>
+                    <div class="resource-id">upcloud-api-dev</div>
+                  </div>
+                  <div class="resource-status">Active</div>
+                </div>
+                <div class="resource-item">
+                  <div class="resource-icon">⍟</div>
+                  <div class="resource-info">
+                    <div class="resource-name">DynamoDB Table</div>
+                    <div class="resource-id">upcloud-findings-dev</div>
+                  </div>
+                  <div class="resource-status">Active</div>
+                </div>
+                <div class="resource-item">
+                  <div class="resource-icon">🔐</div>
+                  <div class="resource-info">
+                    <div class="resource-name">IAM Role</div>
+                    <div class="resource-id">upcloud-lambda-role-dev</div>
+                  </div>
+                  <div class="resource-status">Active</div>
+                </div>
+                <div class="resource-item">
+                  <div class="resource-icon">📊</div>
+                  <div class="resource-info">
+                    <div class="resource-name">CloudWatch Logs</div>
+                    <div class="resource-id">/aws/lambda/upcloud-api-dev</div>
+                  </div>
+                  <div class="resource-status">Active</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="insights-row">
+            <div class="insight-card">
+              <div class="card-header">
+                <div>
+                  <h2>Cloud Computing Concepts</h2>
+                  <p>Demonstrated in this deployment</p>
+                </div>
+              </div>
+              <div class="concepts-grid">
+                <div class="concept-item">
+                  <div class="concept-number">1</div>
+                  <div class="concept-name">Function as a Service (FaaS)</div>
+                  <div class="concept-desc">AWS Lambda serverless compute</div>
+                </div>
+                <div class="concept-item">
+                  <div class="concept-number">2</div>
+                  <div class="concept-name">Auto-Scaling</div>
+                  <div class="concept-desc">0 to 1000s of concurrent requests</div>
+                </div>
+                <div class="concept-item">
+                  <div class="concept-number">3</div>
+                  <div class="concept-name">NoSQL Database</div>
+                  <div class="concept-desc">DynamoDB with GSI</div>
+                </div>
+                <div class="concept-item">
+                  <div class="concept-number">4</div>
+                  <div class="concept-name">Pay-per-Use Pricing</div>
+                  <div class="concept-desc">Only pay for execution time</div>
+                </div>
+                <div class="concept-item">
+                  <div class="concept-number">5</div>
+                  <div class="concept-name">IAM Security</div>
+                  <div class="concept-desc">Role-based access control</div>
+                </div>
+                <div class="concept-item">
+                  <div class="concept-number">6</div>
+                  <div class="concept-name">HTTPS/TLS</div>
+                  <div class="concept-desc">Encrypted communication</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card">
+              <div class="card-header">
+                <div>
+                  <h2>Cost Breakdown</h2>
+                  <p>Monthly cost estimate (AWS Free Tier)</p>
+                </div>
+              </div>
+              <div class="cost-breakdown">
+                <div class="cost-item">
+                  <div class="cost-service">Lambda Invocations</div>
+                  <div class="cost-usage">~1,000 requests/month</div>
+                  <div class="cost-amount">$0.00</div>
+                </div>
+                <div class="cost-item">
+                  <div class="cost-service">Lambda Compute</div>
+                  <div class="cost-usage">~5 seconds/request</div>
+                  <div class="cost-amount">$0.20</div>
+                </div>
+                <div class="cost-item">
+                  <div class="cost-service">DynamoDB Storage</div>
+                  <div class="cost-usage">< 1 GB</div>
+                  <div class="cost-amount">$0.00</div>
+                </div>
+                <div class="cost-item">
+                  <div class="cost-service">DynamoDB Reads/Writes</div>
+                  <div class="cost-usage">On-demand pricing</div>
+                  <div class="cost-amount">$0.25</div>
+                </div>
+                <div class="cost-item">
+                  <div class="cost-service">CloudWatch Logs</div>
+                  <div class="cost-usage">< 5 GB/month</div>
+                  <div class="cost-amount">$0.00</div>
+                </div>
+                <div class="cost-item total">
+                  <div class="cost-service"><strong>Total Monthly Cost</strong></div>
+                  <div class="cost-usage"></div>
+                  <div class="cost-amount"><strong>< $1.00</strong></div>
+                </div>
+              </div>
+              <div class="cost-note">
+                <strong>vs Traditional Server:</strong> EC2 t3.small would cost $20-50/month
+              </div>
+            </div>
+          </div>
+
+          <div class="insight-card">
+            <div class="card-header">
+              <div>
+                <h2>AWS Console Links</h2>
+                <p>View resources in AWS Management Console</p>
+              </div>
+            </div>
+            <div class="console-links">
+              <a href="https://ap-southeast-2.console.aws.amazon.com/lambda/home?region=ap-southeast-2#/functions/upcloud-api-dev" target="_blank" class="console-link">
+                <div class="console-icon">λ</div>
+                <div class="console-info">
+                  <div class="console-name">Lambda Function</div>
+                  <div class="console-desc">View function code and configuration</div>
+                </div>
+                <div class="console-arrow">→</div>
+              </a>
+              <a href="https://ap-southeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-southeast-2#table?name=upcloud-findings-dev" target="_blank" class="console-link">
+                <div class="console-icon">⍟</div>
+                <div class="console-info">
+                  <div class="console-name">DynamoDB Table</div>
+                  <div class="console-desc">View data and table configuration</div>
+                </div>
+                <div class="console-arrow">→</div>
+              </a>
+              <a href="https://ap-southeast-2.console.aws.amazon.com/cloudwatch/home?region=ap-southeast-2#logsV2:log-groups/log-group/$252Faws$252Flambda$252Fupcloud-api-dev" target="_blank" class="console-link">
+                <div class="console-icon">📊</div>
+                <div class="console-info">
+                  <div class="console-name">CloudWatch Logs</div>
+                  <div class="console-desc">View Lambda execution logs</div>
+                </div>
+                <div class="console-arrow">→</div>
+              </a>
+              <a href="https://ap-southeast-2.console.aws.amazon.com/iam/home#/roles/upcloud-lambda-role-dev" target="_blank" class="console-link">
+                <div class="console-icon">🔐</div>
+                <div class="console-info">
+                  <div class="console-name">IAM Role</div>
+                  <div class="console-desc">View permissions and policies</div>
+                </div>
+                <div class="console-arrow">→</div>
+              </a>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="toast" class="toast" role="status"></div>
+
+    <dialog id="finding-dialog" class="modal">
+      <form method="dialog">
+        <button class="modal-close" aria-label="Close">×</button>
+      </form>
+      <div class="modal-label">DEMO FINDING DETAILS</div>
+      <h2 id="dialog-title"></h2>
+      <p id="dialog-summary" class="modal-summary"></p>
+      <dl id="dialog-details" class="modal-details"></dl>
+      <p class="modal-disclaimer">Review the resource and its owner before making any real-world change. This demo does not perform cloud actions.</p>
+    </dialog>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,202 @@
+import sys
+from typing import Optional
+
+from cleancloud.doctor.common import DoctorError, info, success
+
+try:
+    from cleancloud.doctor.aws import run_aws_ai_doctor, run_aws_doctor
+
+    _AWS_DOCTOR_AVAILABLE = True
+except ImportError:
+    _AWS_DOCTOR_AVAILABLE = False
+    run_aws_doctor = run_aws_ai_doctor = None  # type: ignore[assignment]
+
+try:
+    from cleancloud.doctor.azure import run_azure_ai_doctor, run_azure_doctor
+
+    _AZURE_DOCTOR_AVAILABLE = True
+except ImportError:
+    _AZURE_DOCTOR_AVAILABLE = False
+    run_azure_doctor = run_azure_ai_doctor = None  # type: ignore[assignment]
+
+try:
+    from cleancloud.doctor.gcp import run_gcp_ai_doctor, run_gcp_doctor
+
+    _GCP_DOCTOR_AVAILABLE = True
+except ImportError:
+    _GCP_DOCTOR_AVAILABLE = False
+    run_gcp_doctor = run_gcp_ai_doctor = None  # type: ignore[assignment]
+
+_DOCTOR_AVAILABLE = {
+    "aws": lambda: _AWS_DOCTOR_AVAILABLE,
+    "azure": lambda: _AZURE_DOCTOR_AVAILABLE,
+    "gcp": lambda: _GCP_DOCTOR_AVAILABLE,
+}
+_INSTALL_HINTS = {
+    "aws": "pip install 'cleancloud[aws]'",
+    "azure": "pip install 'cleancloud[azure]'",
+    "gcp": "pip install 'cleancloud[gcp]'",
+}
+
+
+def run_doctor(
+    provider: Optional[str] = None,
+    profile: Optional[str] = None,
+    region: Optional[str] = None,
+    project: Optional[str] = None,
+    category: str = "hygiene",
+) -> None:
+    # Validate provider
+    valid_providers = ["aws", "azure", "gcp"]
+    if provider is not None and provider not in valid_providers:
+        info("")
+        print(f"Invalid provider: {provider}")
+        info("")
+        info(f"Valid providers: {', '.join(valid_providers)}")
+        info("Or omit --provider to check both")
+        info("")
+        sys.exit(1)
+
+    # Determine which providers to check
+    providers_to_check = []
+    if provider is None:
+        providers_to_check = ["aws", "azure", "gcp"]
+    else:
+        providers_to_check = [provider]
+
+    # Track results
+    results = {}
+
+    # Main header
+    info("")
+    info("=" * 70)
+    info("CLEANCLOUD ENVIRONMENT DIAGNOSTICS")
+    info("=" * 70)
+    info("")
+    info(f"Providers to check: {', '.join(p.upper() for p in providers_to_check)}")
+    info("")
+
+    # Run checks for each provider
+    for p in providers_to_check:
+        if not _DOCTOR_AVAILABLE.get(p, lambda: True)():
+            hint = _INSTALL_HINTS.get(p, "pip install 'cleancloud[all]'")
+            info(f"Provider '{p}' SDK is not installed. Install it with: {hint}")
+            results[p] = {"status": "failed", "error": f"SDK not installed — {hint}"}
+            if len(providers_to_check) == 1:
+                sys.exit(1)
+            continue
+
+        try:
+            if p == "aws":
+                if category == "ai":
+                    run_aws_ai_doctor(profile=profile, region=region)
+                elif category == "all":
+                    run_aws_doctor(profile=profile, region=region)
+                    run_aws_ai_doctor(profile=profile, region=region)
+                else:
+                    run_aws_doctor(profile=profile, region=region)
+                results[p] = {"status": "passed", "error": None}
+
+            elif p == "azure":
+                # Warn if region is specified for Azure (it's ignored)
+                if region:
+                    info("")
+                    info("Warning: --region parameter is not applicable for Azure")
+                    info("   Azure authentication and validation is not region-specific")
+                    info("   The --region parameter is only used for AWS provider")
+                    info("")
+
+                if category == "ai":
+                    run_azure_ai_doctor()
+                elif category == "all":
+                    run_azure_doctor()
+                    run_azure_ai_doctor()
+                else:
+                    run_azure_doctor()
+                results[p] = {"status": "passed", "error": None}
+
+            elif p == "gcp":
+                # Warn if region is specified for GCP doctor (not applicable)
+                if region:
+                    info("")
+                    info("Warning: --region parameter is not applicable for GCP doctor")
+                    info("   Use --project to scope permission checks to a specific project")
+                    info("")
+
+                if category == "ai":
+                    run_gcp_ai_doctor(project_id=project)
+                elif category == "all":
+                    run_gcp_doctor(project_id=project)
+                    run_gcp_ai_doctor(project_id=project)
+                else:
+                    run_gcp_doctor(project_id=project)
+                results[p] = {"status": "passed", "error": None}
+
+        except DoctorError as e:
+            # Doctor check failed (expected failure with nice error message)
+            results[p] = {"status": "failed", "error": str(e)}
+
+            # If only checking one provider, exit immediately
+            if len(providers_to_check) == 1:
+                sys.exit(3)
+
+            # Otherwise, continue to next provider
+            info("")
+            info(f"{p.upper()} validation failed, continuing to next provider...")
+            info("")
+
+        except Exception as e:
+            # Unexpected error
+            results[p] = {"status": "error", "error": str(e)}
+            info("")
+            print(f"Unexpected error validating {p.upper()}: {e}")
+            info("")
+
+            # If only checking one provider, exit immediately
+            if len(providers_to_check) == 1:
+                sys.exit(1)
+
+    # Print summary if checking multiple providers
+    if len(providers_to_check) > 1:
+        info("")
+        info("=" * 70)
+        info("FINAL SUMMARY")
+        info("=" * 70)
+        info("")
+
+        all_passed = True
+
+        for p in providers_to_check:
+            result = results.get(p, {"status": "unknown", "error": "Not checked"})
+            status = result["status"]
+
+            if status == "passed":
+                success(f"{p.upper()}: PASSED")
+            elif status == "failed":
+                # Don't use fail() here - it raises an exception!
+                # Just print the status
+                print(f"{p.upper()}: FAILED")
+                all_passed = False
+                if result["error"]:
+                    info(f"  Error: {result['error']}")
+            else:
+                print(f"{p.upper()}: ERROR")
+                all_passed = False
+                if result["error"]:
+                    info(f"  Error: {result['error']}")
+
+        info("")
+        info("=" * 70)
+
+        if all_passed:
+            info("")
+            success("ALL PROVIDERS VALIDATED SUCCESSFULLY")
+            info("")
+            sys.exit(0)
+        else:
+            info("")
+            print("SOME PROVIDERS FAILED VALIDATION")
+            info("")
+            info("Fix the errors above and re-run `cleancloud doctor`")
+            info("")
+            sys.exit(3)

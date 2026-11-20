@@ -888,3 +888,266 @@ h1 {
     width: 100%;
   }
 }
+
+
+/* Real scan button */
+.btn-secondary {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #4a5568;
+  background: #ffffff;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background: #f7fafc;
+  border-color: #a0aec0;
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+
+/* Infrastructure View Styles */
+.architecture-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  gap: 20px;
+}
+
+.arch-node {
+  background: #f7fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px 40px;
+  text-align: center;
+  min-width: 200px;
+}
+
+.arch-node.highlight {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.arch-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.arch-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 4px;
+}
+
+.arch-sublabel {
+  font-size: 13px;
+  color: #718096;
+}
+
+.arch-arrow {
+  font-size: 24px;
+  color: #a0aec0;
+}
+
+/* Resource List */
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f7fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.resource-icon {
+  font-size: 24px;
+  width: 40px;
+  text-align: center;
+}
+
+.resource-info {
+  flex: 1;
+}
+
+.resource-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 2px;
+}
+
+.resource-id {
+  font-size: 12px;
+  color: #718096;
+  font-family: 'Courier New', monospace;
+}
+
+.resource-status {
+  font-size: 12px;
+  font-weight: 500;
+  color: #38a169;
+  padding: 4px 12px;
+  background: #c6f6d5;
+  border-radius: 12px;
+}
+
+/* Concepts Grid */
+.concepts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+.concept-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #f7fafc;
+  border-radius: 6px;
+  border-left: 3px solid #cbd5e0;
+}
+
+.concept-number {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a5568;
+  width: 28px;
+  height: 28px;
+  background: #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.concept-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.concept-desc {
+  font-size: 13px;
+  color: #718096;
+}
+
+/* Cost Breakdown */
+.cost-breakdown {
+  padding: 20px;
+}
+
+.cost-item {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.cost-item.total {
+  border-top: 2px solid #cbd5e0;
+  border-bottom: none;
+  margin-top: 8px;
+  padding-top: 16px;
+}
+
+.cost-service {
+  font-size: 14px;
+  color: #2d3748;
+}
+
+.cost-usage {
+  font-size: 13px;
+  color: #718096;
+}
+
+.cost-amount {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  text-align: right;
+}
+
+.cost-note {
+  margin-top: 16px;
+  padding: 12px;
+  background: #edf2f7;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #4a5568;
+}
+
+/* Console Links */
+.console-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.console-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f7fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s ease;
+}
+
+.console-link:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+  transform: translateX(4px);
+}
+
+.console-icon {
+  font-size: 24px;
+  width: 40px;
+  text-align: center;
+}
+
+.console-info {
+  flex: 1;
+}
+
+.console-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 2px;
+}
+
+.console-desc {
+  font-size: 12px;
+  color: #718096;
+}
+
+.console-arrow {
+  font-size: 18px;
+  color: #a0aec0;
+}

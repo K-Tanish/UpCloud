@@ -1,7 +1,8 @@
-"""Read-only dashboard data built from CleanCloud's bundled demo findings."""
+"""Read-only dashboard data built from CleanCloud's bundled demo findings or real AWS scanning."""
 
 from dataclasses import asdict
 from typing import Any, Dict, List, Optional
+import os
 
 from cleancloud.demo.findings import (
     AWS_AI_FINDINGS,
@@ -11,6 +12,14 @@ from cleancloud.demo.findings import (
     GCP_AI_FINDINGS,
     GCP_FINDINGS,
 )
+
+# Import real AWS scanner
+try:
+    from upcloud.aws_scanner import scan_aws_account
+    REAL_SCAN_AVAILABLE = True
+except ImportError:
+    REAL_SCAN_AVAILABLE = False
+    scan_aws_account = None
 
 PROVIDERS = ("aws", "azure", "gcp")
 CATEGORIES = ("hygiene", "ai")
@@ -116,3 +125,48 @@ def run_demo_scan(provider: str = "all", category: str = "hygiene") -> Dict[str,
         "Demo scan complete. These are bundled sample findings, not live cloud data."
     )
     return dashboard
+
+
+def run_real_aws_scan(region: str = "ap-southeast-2") -> Dict[str, Any]:
+    """
+    Scan the actual AWS account for real wasteful resources.
+    
+    This makes real AWS API calls and returns actual findings.
+    """
+    if not REAL_SCAN_AVAILABLE or scan_aws_account is None:
+        return {
+            "error": "Real AWS scanning not available",
+            "message": "AWS scanner module not found"
+        }
+    
+    try:
+        # Scan the real AWS account
+        real_findings = scan_aws_account(region=region)
+        
+        # Calculate summary statistics
+        total_findings = len(real_findings)
+        high_risk_count = sum(1 for f in real_findings if f.get('risk_level') == 'high')
+        monthly_waste = sum(f.get('estimated_monthly_cost_usd', 0) for f in real_findings)
+        
+        # Count by provider (will all be AWS for now)
+        by_provider = {'aws': total_findings, 'azure': 0, 'gcp': 0}
+        
+        return {
+            "mode": "real_aws_scan",
+            "provider": "aws",
+            "region": region,
+            "total_findings": total_findings,
+            "high_risk_findings": high_risk_count,
+            "estimated_monthly_waste_usd": round(monthly_waste, 2),
+            "by_provider": by_provider,
+            "findings": real_findings,
+            "message": f"Real AWS scan complete. Found {total_findings} wasteful resources in your account.",
+            "scan_timestamp": real_findings[0]['detected_at'] if real_findings else None
+        }
+    
+    except Exception as e:
+        return {
+            "error": "AWS scan failed",
+            "message": str(e),
+            "help": "Ensure Lambda has IAM permissions to scan EC2 resources"
+        }

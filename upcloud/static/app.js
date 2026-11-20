@@ -8,6 +8,35 @@ const toast = document.querySelector("#toast");
 let findings = [];
 let toastTimer;
 
+// View switching - MUST BE AT TOP
+function switchView(viewName) {
+  const dashboardView = document.getElementById("dashboard-view");
+  const infrastructureView = document.getElementById("infrastructure-view");
+  
+  if (viewName === "dashboard") {
+    dashboardView.style.display = "block";
+    infrastructureView.style.display = "none";
+  } else if (viewName === "infrastructure") {
+    dashboardView.style.display = "none";
+    infrastructureView.style.display = "block";
+  }
+}
+
+// Setup nav links
+document.querySelectorAll(".nav-item").forEach(link => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    const view = link.dataset.view;
+    
+    // Update active state
+    document.querySelectorAll(".nav-item").forEach(l => l.classList.remove("active"));
+    link.classList.add("active");
+    
+    // Switch view
+    switchView(view);
+  });
+});
+
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (character) => ({
     "&": "&amp;",
@@ -179,5 +208,37 @@ scanButton.addEventListener("click", async () => {
     scanButton.innerHTML = '<span aria-hidden="true">↻</span> Run demo scan';
   }
 });
+
+// Real AWS scan button
+const realScanButton = document.querySelector("#real-scan-button");
+if (realScanButton) {
+  realScanButton.addEventListener("click", async () => {
+    realScanButton.disabled = true;
+    realScanButton.innerHTML = '<span aria-hidden="true">☁</span> Scanning AWS...';
+    try {
+      const result = await requestJson("/api/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scan_type: "real" }),
+      });
+      
+      if (result.error) {
+        showToast(`Scan failed: ${result.message}`, true);
+      } else {
+        // Update findings with real data
+        findings = result.findings || [];
+        renderDashboard(result);
+        renderFindings();
+        document.querySelector("#updated-label").textContent = `Real AWS scan - ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+        showToast(result.message || `Found ${result.total_findings} real wasteful resources!`);
+      }
+    } catch (error) {
+      showToast(`AWS scan error: ${error.message}`, true);
+    } finally {
+      realScanButton.disabled = false;
+      realScanButton.innerHTML = '<span aria-hidden="true">☁</span> Scan Real AWS';
+    }
+  });
+}
 
 loadDashboard().catch((error) => showToast(`Could not load dashboard: ${error.message}`, true));

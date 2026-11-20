@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>UpCloud Infrastructure</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <a class="brand" href="/" aria-label="UpCloud home">
+          <span class="brand-mark">U</span>
+          <span class="brand-text">upcloud</span>
+        </a>
+        <div class="nav-links">
+          <a class="nav-item" href="/">Dashboard</a>
+          <a class="nav-item active" href="/infra.html">Infrastructure</a>
+        </div>
+      </div>
+      <div class="nav-right">
+        <span class="status-badge"><span class="status-dot"></span>AWS Deployed</span>
+      </div>
+    </div>
+  </nav>
+
+  <main style="max-width: 1200px; margin: 0 auto; padding: 40px 20px;">
+    <div style="padding: 40px 0;">
+      <p style="font-size: 12px; color: #718096; letter-spacing: 0.1em; margin-bottom: 12px;">AWS INFRASTRUCTURE</p>
+      <h1 style="font-size: 36px; margin-bottom: 12px;">Cloud Resources</h1>
+      <p style="color: #718096; margin-bottom: 40px;">Real AWS infrastructure deployed in ap-southeast-2 region</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid" style="margin-bottom: 40px;">
+      <div class="stat-card">
+        <div class="stat-icon">λ</div>
+        <div class="stat-label">LAMBDA FUNCTION</div>
+        <div class="stat-value">Active</div>
+        <div class="stat-desc">upcloud-api-dev</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-label">MEMORY</div>
+        <div class="stat-value">512 MB</div>
+        <div class="stat-desc">Auto-scales</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⍟</div>
+        <div class="stat-label">DATABASE</div>
+        <div class="stat-value">DynamoDB</div>
+        <div class="stat-desc">NoSQL</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🌍</div>
+        <div class="stat-label">REGION</div>
+        <div class="stat-value">Sydney</div>
+        <div class="stat-desc">ap-southeast-2</div>
+      </div>
+    </div>
+
+    <!-- Architecture -->
+    <div class="insight-card" style="margin-bottom: 20px;">
+      <h2 style="font-size: 18px; margin-bottom: 20px;">Architecture Diagram</h2>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px;">
+        <div style="background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px 40px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 8px;">👤</div>
+          <div style="font-weight: 600;">User Browser</div>
+          <div style="font-size: 13px; color: #718096;">HTTPS</div>
+        </div>
+        <div style="font-size: 24px; color: #a0aec0;">↓</div>
+        <div style="background: #edf2f7; border: 2px solid #cbd5e0; border-radius: 8px; padding: 20px 40px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 8px;">λ</div>
+          <div style="font-weight: 600;">Lambda Function URL</div>
+          <div style="font-size: 13px; color: #718096;">Python 3.11 | 512MB</div>
+        </div>
+        <div style="font-size: 24px; color: #a0aec0;">↓</div>
+        <div style="background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px 40px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 8px;">⍟</div>
+          <div style="font-weight: 600;">DynamoDB</div>
+          <div style="font-size: 13px; color: #718096;">NoSQL | On-demand</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AWS Console Links -->
+    <div class="insight-card">
+      <h2 style="font-size: 18px; margin-bottom: 20px;">AWS Console Links</h2>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <a href="https://ap-southeast-2.console.aws.amazon.com/lambda/home?region=ap-southeast-2#/functions/upcloud-api-dev" target="_blank" style="display: flex; align-items: center; gap: 16px; padding: 16px; background: #f7fafc; border-radius: 6px; border: 1px solid #e2e8f0; text-decoration: none; color: inherit;">
+          <div style="font-size: 24px; width: 40px; text-align: center;">λ</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 2px;">Lambda Function</div>
+            <div style="font-size: 12px; color: #718096;">View function code and configuration</div>
+          </div>
+          <div style="font-size: 18px; color: #a0aec0;">→</div>
+        </a>
+        <a href="https://ap-southeast-2.console.aws.amazon.com/dynamodbv2/home?region=ap-southeast-2#table?name=upcloud-findings-dev" target="_blank" style="display: flex; align-items: center; gap: 16px; padding: 16px; background: #f7fafc; border-radius: 6px; border: 1px solid #e2e8f0; text-decoration: none; color: inherit;">
+          <div style="font-size: 24px; width: 40px; text-align: center;">⍟</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 2px;">DynamoDB Table</div>
+            <div style="font-size: 12px; color: #718096;">View data and table configuration</div>
+          </div>
+          <div style="font-size: 18px; color: #a0aec0;">→</div>
+        </a>
+        <a href="https://ap-southeast-2.console.aws.amazon.com/cloudwatch/home?region=ap-southeast-2#logsV2:log-groups/log-group/$252Faws$252Flambda$252Fupcloud-api-dev" target="_blank" style="display: flex; align-items: center; gap: 16px; padding: 16px; background: #f7fafc; border-radius: 6px; border: 1px solid #e2e8f0; text-decoration: none; color: inherit;">
+          <div style="font-size: 24px; width: 40px; text-align: center;">📊</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 2px;">CloudWatch Logs</div>
+            <div style="font-size: 12px; color: #718096;">View Lambda execution logs</div>
+          </div>
+          <div style="font-size: 18px; color: #a0aec0;">→</div>
+        </a>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #edf2f7; border-radius: 6px;">
+      <p style="font-weight: 600; margin-bottom: 8px;">Cost: &lt;$1/month</p>
+      <p style="font-size: 14px; color: #4a5568;">This serverless deployment costs 95% less than traditional EC2 servers ($20-50/month)</p>
+    </div>
+  </main>
+</body>
+</html>

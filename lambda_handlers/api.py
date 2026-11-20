@@ -9,7 +9,7 @@ from urllib.parse import parse_qs
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from upcloud.service import get_dashboard, get_findings, run_demo_scan
+from upcloud.service import get_dashboard, get_findings, run_demo_scan, run_real_aws_scan
 
 
 def _get_query_param(event: Dict[str, Any], key: str, default: str = "") -> str:
@@ -87,10 +87,17 @@ def _handle_scan(event: Dict[str, Any]) -> Dict[str, Any]:
         body = json.loads(event.get('body', '{}'))
         provider = body.get('provider', 'all')
         category = body.get('category', 'hygiene')
+        scan_type = body.get('scan_type', 'demo')  # 'demo' or 'real'
         
         if not isinstance(provider, str) or not isinstance(category, str):
             return _response(400, {'error': 'provider and category must be strings'})
         
+        # Run real AWS scan if requested
+        if scan_type == 'real':
+            scan_result = run_real_aws_scan()
+            return _response(200, scan_result)
+        
+        # Otherwise run demo scan
         scan_result = run_demo_scan(provider, category)
         return _response(200, scan_result)
     except json.JSONDecodeError:
@@ -148,6 +155,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     }
             except Exception as e:
                 print(f"Error serving index.html: {e}")
+        
+        if path == '/infra.html':
+            try:
+                with open('/var/task/upcloud/static/infra.html', 'r', encoding='utf-8') as f:
+                    return {
+                        'statusCode': 200,
+                        'headers': {
+                            'Content-Type': 'text/html; charset=utf-8',
+                            'Cache-Control': 'no-cache'
+                        },
+                        'body': f.read()
+                    }
+            except Exception as e:
+                print(f"Error serving infra.html: {e}")
+                return {
+                    'statusCode': 500,
+                    'headers': {'Content-Type': 'text/plain'},
+                    'body': f'Error loading infra.html: {str(e)}'
+                }
         
         if path.endswith('.css'):
             try:
