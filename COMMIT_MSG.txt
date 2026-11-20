@@ -1,0 +1,64 @@
+Transform CleanCloud into UpCloud serverless web application
+
+Major Changes:
+- Built serverless web application on AWS Lambda + DynamoDB
+- Created professional grey-toned UI with horizontal navigation
+- Implemented RESTful API for cloud cost monitoring
+- Added comprehensive project documentation
+
+Frontend:
+- Responsive dashboard with real-time cost analytics
+- Professional monochrome design (grey palette, no bright colors)
+- Horizontal top navigation with subtle grid background
+- Pure vanilla JavaScript (no frameworks)
+
+Backend:
+- AWS Lambda Function URL serving both frontend and API
+- DynamoDB NoSQL database with Global Secondary Index
+- Python 3.11 serverless compute
+- CORS-enabled HTTPS endpoint
+
+Architecture:
+- Single Lambda Function URL for frontend + API (solves mixed content)
+- Auto-scaling serverless compute
+- Pay-per-use pricing model
+- Infrastructure as Code deployment
+
+Documentation:
+- PROJECT_REPORT.md - 30-page comprehensive report
+- PROJECT_SUMMARY.md - Quick overview
+- DEPLOYMENT.md - AWS deployment guide
+- QUICK_START.md - Reference guide
+- SOLUTION.md - Technical details
+
+Cloud Concepts Demonstrated (13+):
+- Function as a Service (FaaS)
+- Serverless Architecture
+- NoSQL Database
+- Auto-Scaling
+- High Availability
+- Pay-per-Use Pricing
+- Infrastructure as Code
+- RESTful API Design
+- CORS
+- IAM Role-Based Access
+- HTTPS/TLS
+- Stateless Applications
+- Event-Driven Computing
+
+Deployment:
+- Live at: https://bq32gaqqawjzx4f7dh3cqivqiy0sctuc.lambda-url.ap-southeast-2.on.aws/
+- AWS Free Tier eligible
+- <$1/month cost after free tier
+- One-click deployment script
+
+Cleanup:
+- Removed Docker configuration (not needed for Lambda)
+- Removed CI/CD workflows (semester project)
+- Removed test infrastructure
+- Removed provider-specific CLI docs
+- Removed security/schema files
+- Cleaned up build artifacts
+
+This is a Cloud Computing semester project demonstrating practical
+AWS serverless deployment and cloud-native application architecture.

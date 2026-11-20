@@ -30,8 +30,13 @@ function providerName(provider) {
   return ({ aws: "AWS", azure: "Azure", gcp: "Google Cloud" })[provider] || provider;
 }
 
+// Get API base URL from config (set by config.js)
+const API_BASE = window.API_BASE_URL || '';
+
 async function requestJson(url, options) {
-  const response = await fetch(url, options);
+  // Prepend API base URL if not already absolute
+  const fullUrl = url.startsWith('http') ? url : `${API_BASE}${url}`;
+  const response = await fetch(fullUrl, options);
   const body = await response.json();
   if (!response.ok) throw new Error(body.error || `Request failed (${response.status})`);
   return body;
@@ -58,16 +63,15 @@ function renderDashboard(summary) {
   document.querySelector("#high-risk").textContent = summary.high_risk_findings;
   document.querySelector("#provider-count").textContent = Object.values(summary.by_provider)
     .filter((count) => count > 0).length;
-  document.querySelector("#nav-count").textContent = summary.total_findings;
 
   const names = ["aws", "azure", "gcp"];
   const maxCount = Math.max(1, ...names.map((name) => summary.by_provider[name] || 0));
   document.querySelector("#provider-chart").innerHTML = names.map((name) => {
     const count = summary.by_provider[name] || 0;
-    const label = name === "gcp" ? "Google Cloud" : providerName(name);
+    const label = name === "gcp" ? "Google Cloud" : name === "aws" ? "AWS" : "Azure";
     return `<div class="provider-row">
-      <span class="provider-name"><span class="provider-symbol ${name}">${name === "aws" ? "A" : name === "azure" ? "M" : "G"}</span>${label}</span>
-      <span class="bar-track"><span class="bar-fill ${name}" style="display:block;width:${(count / maxCount) * 100}%"></span></span>
+      <span class="provider-name"><span class="provider-symbol">${name === "aws" ? "A" : name === "azure" ? "M" : "G"}</span>${label}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:${(count / maxCount) * 100}%"></span></span>
       <span class="provider-total">${count}</span>
     </div>`;
   }).join("");
@@ -79,7 +83,7 @@ function renderDashboard(summary) {
   const opportunities = document.querySelector("#top-opportunities");
   opportunities.innerHTML = largest.length
     ? largest.map((finding) => `<div class="opportunity-row">
-      <span class="opportunity-icon" aria-hidden="true">↗</span>
+      <span class="opportunity-icon">↗</span>
       <span class="opportunity-info"><strong>${escapeHtml(finding.title)}</strong><span>${escapeHtml(providerName(finding.provider))} · ${escapeHtml(finding.region || "Global")}</span></span>
       <span class="opportunity-cost">${money(finding.estimated_monthly_cost_usd)}<small>/mo</small></span>
     </div>`).join("")
@@ -93,7 +97,7 @@ function renderFindings() {
     const provider = escapeHtml(finding.provider);
     const initials = provider === "aws" ? "A" : provider === "azure" ? "M" : "G";
     return `<tr>
-      <td><div class="resource-cell"><span class="resource-avatar">${initials}</span><span><span class="resource-title">${escapeHtml(finding.title)}</span><span class="resource-id">${escapeHtml(finding.resource_id)}</span></span></div></td>
+      <td><div class="resource-cell"><span class="resource-avatar">${initials}</span><div><span class="resource-title">${escapeHtml(finding.title)}</span><div class="resource-id">${escapeHtml(finding.resource_id)}</div></div></div></td>
       <td><span class="provider-pill ${provider}">${escapeHtml(providerName(provider))}</span></td>
       <td>${escapeHtml(finding.region || "Global")}</td>
       <td><span class="risk-pill ${escapeHtml(finding.risk)}">${escapeHtml(finding.risk)}</span></td>

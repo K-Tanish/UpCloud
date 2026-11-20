@@ -81,3 +81,11 @@ Desktop.ini
 .env.*
 *.pem
 *.key
+
+############################
+# AWS / Deployment artifacts
+############################
+lambda_package.zip
+package/
+response.json
+test_extract/

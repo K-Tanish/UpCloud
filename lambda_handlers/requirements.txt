@@ -1,0 +1,4 @@
+# Lambda-specific requirements
+# Note: boto3 is already available in Lambda runtime
+PyYAML>=6.0
+click>=8.1.0
